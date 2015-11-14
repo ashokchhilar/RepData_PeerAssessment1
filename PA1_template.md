@@ -4,48 +4,70 @@ output:
   html_document:
     keep_md: true
 ---
-```{r}
+
+```r
 library(ggplot2)
 ```
 
 ## Loading and preprocessing the data
-```{r echo=TRUE}
+
+```r
 data <- read.csv(unz("activity.zip", "activity.csv"))
 str(data)
 ```
 
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
 ## What is mean total number of steps taken per day?
-```{r echo=TRUE}
+
+```r
 dailystepcount <- aggregate(formula = steps ~ date, data = data, FUN = sum, na.rm = TRUE)
 daily_mean<-mean(dailystepcount$steps)
 daily_median<-median(dailystepcount$steps)
 ```
   
-Mean of Daily step count = `r daily_mean`  
-Median of Daily step count = `r daily_median`
-```{r}
+Mean of Daily step count = 1.0766189 &times; 10<sup>4</sup>  
+Median of Daily step count = 10765
+
+```r
 g = ggplot(dailystepcount, aes(x=steps))
 g = g + geom_histogram(binwidth=5000, color = "white", fill = "grey")
 print(g)
 ```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
   
 ## What is the average daily activity pattern?
-```{r, echo=TRUE}
+
+```r
 time_series<-aggregate(formula = steps ~ interval, data = data, FUN = mean, na.rm = TRUE)
 g = ggplot(time_series, aes(x=interval, y = steps)) + geom_line()
 g = g + xlab("5-min Interval") + ylab("Average Steps taken") + ggtitle("Average daily steps pattern")
 print(g)
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
 ## Imputing missing values
 Total number of missing values
-```{r, echo=TRUE}
+
+```r
 sum(is.na(data$steps))
+```
+
+```
+## [1] 2304
 ```
 
 ###Impute the missing values
 Strategy to impute : Take the overall average for the interval for which step count is missing. If an overall average is not available, then take 0 as step count.  
-```{r, echo=TRUE}
+
+```r
 #Filled data set
 imputeddata<-data
 for(i in 1:nrow(imputeddata))
@@ -64,24 +86,27 @@ for(i in 1:nrow(imputeddata))
     imputeddata[i,]$steps = replace
   }
 }
-
 ```
 
 ###Stats after imputing
 
-```{r echo=TRUE}
+
+```r
 dailystepcount_imputed <- aggregate(formula = steps ~ date, data = imputeddata, FUN = sum)
 daily_mean_imputed<-mean(dailystepcount_imputed$steps)
 daily_median_imputed<-median(dailystepcount_imputed$steps)
 ```
   
-Mean of Daily step count = `r daily_mean_imputed`  
-Median of Daily step count = `r daily_median_imputed`
-```{r, echo=TRUE}
+Mean of Daily step count = 9544.5790288  
+Median of Daily step count = 1.0395 &times; 10<sup>4</sup>
+
+```r
 g = ggplot(dailystepcount_imputed, aes(x=steps))
 g = g + geom_histogram(binwidth=5000, color = "white", fill = "grey")
 print(g)
 ```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 ###Impact imputing data
 1.  Counts in some buckets have increased
@@ -92,7 +117,8 @@ This could indicate some issues while collecting smaller step counts
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ###Get the extra column to indicate whether it is a weekday or weekend
-```{r}
+
+```r
 imputeddata$date <- as.Date(imputeddata$date)
 
 #write a function to get whether it is weekend or weekday
@@ -114,8 +140,19 @@ imputeddata$day <-sapply(imputeddata$date, getday)
 head(imputeddata)
 ```
 
+```
+##       steps       date interval     day
+## 1 0.0000000 2012-10-01        0 weekday
+## 2 0.0754717 2012-10-01        5 weekday
+## 3 1.4716981 2012-10-01       10 weekday
+## 4 0.1509434 2012-10-01       15 weekday
+## 5 0.1698113 2012-10-01       20 weekday
+## 6 0.0000000 2012-10-01       25 weekday
+```
+
 ###Panel Plot for weekdays and weekends
-```{r}
+
+```r
 time_series_withday <- aggregate(formula = steps ~ interval+day, data = imputeddata, FUN = sum, na.rm = TRUE)
 
 g = ggplot(time_series_withday, aes(x=interval, y = steps)) + geom_line()
@@ -123,3 +160,5 @@ g = g + xlab("5-min Interval") + ylab("Average Number Steps taken") + ggtitle("D
 g = g + facet_grid(day~.)
 print(g)
 ```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
