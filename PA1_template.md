@@ -27,12 +27,30 @@ str(data)
 
 ```r
 dailystepcount <- aggregate(formula = steps ~ date, data = data, FUN = sum, na.rm = TRUE)
-daily_mean<-mean(dailystepcount$steps)
-daily_median<-median(dailystepcount$steps)
 ```
   
-Mean of Daily step count = 1.0766189 &times; 10<sup>4</sup>  
-Median of Daily step count = 10765
+Mean of Daily step count
+
+```r
+mean(dailystepcount$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+
+Median of Daily step count
+
+```r
+median(dailystepcount$steps)
+```
+
+```
+## [1] 10765
+```
+
+###Histogram for daily step counts
 
 ```r
 g = ggplot(dailystepcount, aes(x=steps))
@@ -40,7 +58,7 @@ g = g + geom_histogram(binwidth=5000, color = "white", fill = "grey")
 print(g)
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
   
 ## What is the average daily activity pattern?
 
@@ -51,8 +69,18 @@ g = g + xlab("5-min Interval") + ylab("Average Steps taken") + ggtitle("Average 
 print(g)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
+###Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+```r
+time_series[which.max(time_series$steps),]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
+```
 ## Imputing missing values
 Total number of missing values
 
@@ -106,7 +134,7 @@ g = g + geom_histogram(binwidth=5000, color = "white", fill = "grey")
 print(g)
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
 ###Impact imputing data
 1.  Counts in some buckets have increased
@@ -161,4 +189,4 @@ g = g + facet_grid(day~.)
 print(g)
 ```
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
